@@ -5,7 +5,7 @@
 extern crate lazy_static;
 
 #[allow(unused_imports)]
-use panic_semihosting;
+use panic_itm;
 
 use core::cell::RefCell;
 use cortex_m;
@@ -32,13 +32,14 @@ fn main() -> ! {
         w.iopaen().set_bit()
          .iopeen().set_bit()
     });
-    rcc.apb2enr.modify(|_, w| w.syscfgen().set_bit());
+    rcc.apb2enr.modify(|_, w| w.syscfgen().enabled());
 
     // 3. Configure PA0 pin as input, pull-down
     let gpioa = &stm32f3_peripherals.GPIOA;
     gpioa.moder.modify(|_, w| w.moder0().input());
-    //gpioa.pupdr.modify(|_, w| unsafe { w.pupdr0().bits(0b00) });
-    gpioa.pupdr.modify(|_, w| unsafe { w.pupdr0().bits(0b10) }); // pull-down
+    gpioa.pupdr.modify(|_, w| unsafe { w.pupdr0().bits(0b10) }); // 00 = No pull-up, pull-down
+                                                                 // 01 = pull-up
+                                                                 // 10 = pull-down
 
     // configure PE8, PE9 as output
     let gpioe = &stm32f3_peripherals.GPIOE;

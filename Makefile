@@ -16,4 +16,9 @@ distclean:
 	cargo clean
 
 openocd:
-	openocd -f interface/stlink-v2-1.cfg -f target/stm32f3x.cfg
+	openocd --file ./openocd.cfg
+
+itm:
+	rm -f itm.fifo
+	touch itm.fifo
+	itmdump -F -f itm.fifo
