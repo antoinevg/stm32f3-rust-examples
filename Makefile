@@ -19,6 +19,6 @@ openocd:
 	openocd --file ./openocd.cfg
 
 itm:
-	rm -f itm.fifo
-	touch itm.fifo
-	itmdump -F -f itm.fifo
+	rm -f /tmp/itm.fifo
+	touch /tmp/itm.fifo
+	itmdump -F -f /tmp/itm.fifo
