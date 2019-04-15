@@ -11,12 +11,12 @@ use core::cell::RefCell;
 use cortex_m;
 use cortex_m::interrupt::Mutex;
 use cortex_m_rt::entry;
-use stm32f30x;
+use stm32f3::stm32f303;
 
 lazy_static! {
-    static ref MUTEX_GPIOA: Mutex<RefCell<Option<stm32f30x::GPIOA>>> = Mutex::new(RefCell::new(None));
-    static ref MUTEX_GPIOE: Mutex<RefCell<Option<stm32f30x::GPIOE>>> = Mutex::new(RefCell::new(None));
-    static ref MUTEX_EXTI:  Mutex<RefCell<Option<stm32f30x::EXTI>>>  = Mutex::new(RefCell::new(None));
+    static ref MUTEX_GPIOA: Mutex<RefCell<Option<stm32f303::GPIOA>>> = Mutex::new(RefCell::new(None));
+    static ref MUTEX_GPIOE: Mutex<RefCell<Option<stm32f303::GPIOE>>> = Mutex::new(RefCell::new(None));
+    static ref MUTEX_EXTI:  Mutex<RefCell<Option<stm32f303::EXTI>>>  = Mutex::new(RefCell::new(None));
 }
 
 
@@ -24,7 +24,7 @@ lazy_static! {
 fn main() -> ! {
     // 1. get peripherals
     let cortexm_peripherals = cortex_m::Peripherals::take().unwrap();
-    let stm32f3_peripherals = stm32f30x::Peripherals::take().unwrap();
+    let stm32f3_peripherals = stm32f303::Peripherals::take().unwrap();
 
     // 2. Enable GPIOA and SYSCFG clocks
     let rcc = &stm32f3_peripherals.RCC;
@@ -32,14 +32,12 @@ fn main() -> ! {
         w.iopaen().set_bit()
          .iopeen().set_bit()
     });
-    rcc.apb2enr.modify(|_, w| w.syscfgen().enabled());
+    rcc.apb2enr.modify(|_, w| w.syscfgen().set_bit());
 
     // 3. Configure PA0 pin as input, pull-down
     let gpioa = &stm32f3_peripherals.GPIOA;
     gpioa.moder.modify(|_, w| w.moder0().input());
-    gpioa.pupdr.modify(|_, w| unsafe { w.pupdr0().bits(0b10) }); // 00 = No pull-up, pull-down
-                                                                 // 01 = pull-up
-                                                                 // 10 = pull-down
+    gpioa.pupdr.modify(|_, w| w.pupdr0().pull_down());
 
     // configure PE8, PE9 as output
     let gpioe = &stm32f3_peripherals.GPIOE;
@@ -49,8 +47,8 @@ fn main() -> ! {
     });
 
     // 4. connect EXTI0 line to PA0 pin
-    let syscfg = &stm32f3_peripherals.SYSCFG;
-    syscfg.exticr1.modify(|_, w| unsafe { w.exti0().bits(0b000) }); // w.exti0().pa0()
+    let syscfg = &stm32f3_peripherals.SYSCFG_COMP_OPAMP;
+    syscfg.syscfg_exticr1.modify(|_, w| unsafe { w.exti0().bits(0b000) }); // w.exti0().pa0()
 
     // 5. Configure EXTI0 line (external interrupts) mode=interrupt and trigger=rising-edge
     let exti = &stm32f3_peripherals.EXTI;
@@ -67,7 +65,7 @@ fn main() -> ! {
 
     // 7. Enable EXTI0 Interrupt
     let mut nvic = cortexm_peripherals.NVIC;
-    nvic.enable(stm32f30x::Interrupt::EXTI0);
+    nvic.enable(stm32f303::Interrupt::EXTI0);
 
     loop {
         // read the state of the user button
@@ -92,7 +90,7 @@ fn main() -> ! {
 
 
 // 8. Handle interrupt
-use stm32f30x::interrupt;
+use stm32f303::interrupt;
 
 #[interrupt]
 fn EXTI0() {
