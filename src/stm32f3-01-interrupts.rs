@@ -26,7 +26,7 @@ fn main() -> ! {
     let cortexm_peripherals = cortex_m::Peripherals::take().unwrap();
     let stm32f3_peripherals = stm32f303::Peripherals::take().unwrap();
 
-    // 2. Enable GPIOA and SYSCFG clocks
+    // 2. enable GPIOA and SYSCFG clocks
     let rcc = &stm32f3_peripherals.RCC;
     rcc.ahbenr.modify(|_, w| {
         w.iopaen().set_bit()

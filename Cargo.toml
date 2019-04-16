@@ -26,3 +26,7 @@ path = "src/stm32f3-01-interrupts.rs"
 [[bin]]
 name = "stm32f3-02-dma"
 path = "src/stm32f3-02-dma.rs"
+
+
+[profile.dev]
+opt-level = 3
