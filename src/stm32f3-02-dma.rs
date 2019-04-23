@@ -156,20 +156,17 @@ fn DMA2_CH3() {
         let refcell = MUTEX_DMA2.borrow(cs).borrow();
         let dma2 = match refcell.as_ref() { None => return State::Error, Some(v) => v };
 
-        // cache interrupt status
+        // cache interrupt status before clearing interrupt flag
         let isr = dma2.isr.read();
-        let is_tc = isr.tcif3().is_complete();
-        let is_ht = isr.htif3().is_half();
-        let is_te = isr.teif3().is_error();
 
         // clear interrupt flag and return dma state
-        if is_tc {
+        if isr.tcif3().is_complete() {
             dma2.ifcr.write(|w| w.ctcif3().clear());
             return State::TC;
-        } else if is_ht {
+        } else if isr.htif3().is_half() {
             dma2.ifcr.write(|w| w.chtif3().clear());
             return State::HT;
-        } else if is_te {
+        } else if isr.teif3().is_error() {
             dma2.ifcr.write(|w| w.cteif3().clear());
             return State::Error;
         }
