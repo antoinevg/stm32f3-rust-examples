@@ -9,6 +9,7 @@ edition = "2018"
 cortex-m = "0.5.8"
 cortex-m-rt = "0.6.7"
 panic-itm = "0.4.0"
+atomic = "0.4"
 
 [dependencies.stm32f3]
 version = "0.6.0"
