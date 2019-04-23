@@ -1,3 +1,7 @@
+// This code is part of an article on using DMA with Embedded Rust
+//
+// See: https://flowdsp.io/blog/stm32f3-02-dac-dma/
+
 #![no_std]
 #![no_main]
 
@@ -19,9 +23,6 @@ use stm32f303::interrupt;
 use atomic::Atomic;
 
 mod wavetable;
-
-// This code is part of an article on using DMA with Embedded Rust:
-// See: https://flowdsp.io/blog/stm32f3-02-dac-dma/
 
 
 // - leds ---------------------------------------------------------------------
@@ -271,7 +272,6 @@ fn main() -> ! {
     // enter main loop
     loop {
         cortex_m::asm::wfi(); // wait for interrupt
-
         // TODO click button to start/stop audio?
     }
 }

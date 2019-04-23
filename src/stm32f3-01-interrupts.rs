@@ -1,3 +1,7 @@
+// This code is part of an article on using DMA with Embedded Rust
+//
+// See: https://flowdsp.io/blog/stm32f3-01-interrupts/
+
 #![no_std]
 #![no_main]
 
