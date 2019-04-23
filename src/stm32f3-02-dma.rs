@@ -272,6 +272,5 @@ fn main() -> ! {
     // enter main loop
     loop {
         cortex_m::asm::wfi(); // wait for interrupt
-        // TODO click button to start/stop audio?
     }
 }
